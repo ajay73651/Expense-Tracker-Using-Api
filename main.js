@@ -2,7 +2,7 @@ var seletedRow = null;
 
 function onFormSubmit() {
   var formData = readFormData();
-  axios.post("https://crudcrud.com/api/bed8b37a92984eb2b286033137f7a4c7/appointmentData", formData)
+  axios.post("https://crudcrud.com/api/7678db3489ef4704bd864cd4819f14a1/appointmentData", formData)
   .then((response)=>{
     console.log(response.data);
     insertNewRecord(response.data);
@@ -43,7 +43,7 @@ function resetForm() {
   seletedRow = null;
 }
 
-axios.get("https://crudcrud.com/api/bed8b37a92984eb2b286033137f7a4c7/appointmentData")
+axios.get("https://crudcrud.com/api/7678db3489ef4704bd864cd4819f14a1/appointmentData")
   .then((response)=>{
     console.log(response.data);
     for (var i = 0; i < response.data.length; i++) {
