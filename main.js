@@ -1,24 +1,24 @@
 var selectedRow = null;
-
-function onFormSubmit() {
-  var formData = readFormData();
-  axios.post("https://crudcrud.com/api/cc8c91e2ac264f029237616460f73833/appointmentData", formData)
-    .then((response) => {
-      console.log(response.data);
-      insertNewRecord(response.data);
-    })
-    .catch((err) => {
-      console.log(err);
-    })
-  resetForm();
-}
-
+const api_url = "https://crudcrud.com/api/0b367c81838e4431a75991cdbc3c2c01/appointmentData";
 function readFormData() {
   var formData = {};
   formData["fullname"] = document.getElementById("fullname").value;
   formData["email"] = document.getElementById("email").value;
   formData["phone"] = document.getElementById("phone").value;
   return formData;
+}
+
+function onFormSubmit() {
+  var formData = readFormData();
+    // Create new record
+    axios.post(api_url, formData)
+      .then((response) => {
+        insertNewRecord(response.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  resetForm();
 }
 
 function insertNewRecord(data) {
@@ -37,6 +37,7 @@ function insertNewRecord(data) {
                       <a data-id="${data._id}" onClick="onDelete(this)">Delete</a>`;
 }
 
+
 function resetForm() {
   document.getElementById("fullname").value = "";
   document.getElementById("email").value = "";
@@ -44,9 +45,8 @@ function resetForm() {
   selectedRow = null;
 }
 
-axios.get("https://crudcrud.com/api/cc8c91e2ac264f029237616460f73833/appointmentData")
+axios.get(api_url)
   .then((response) => {
-    console.log(response.data);
     for (var i = 0; i < response.data.length; i++) {
       insertNewRecord(response.data[i]);
     }
@@ -55,23 +55,41 @@ axios.get("https://crudcrud.com/api/cc8c91e2ac264f029237616460f73833/appointment
     console.log(err);
   })
 
-
   function onEdit(td) {
-    onDelete(td);
-    seletedRow = td.parentElement.parentElement;
-    document.getElementById("fullname").value = seletedRow.cells[0].innerHTML;
-    document.getElementById("email").value = seletedRow.cells[1].innerHTML;
-    document.getElementById("phone").value = seletedRow.cells[2].innerHTML;
-    // let formData2 = readFormData();
-    // console.log(formData2);
-    // localStorage.removeItem(formData2.email, formData2);
-  }
-  
+  selectedRow = td.parentElement.parentElement;
+  const id = td.dataset.id;
+  document.getElementById("fullname").value = selectedRow.cells[0].innerHTML;
+  document.getElementById("email").value = selectedRow.cells[1].innerHTML;
+  document.getElementById("phone").value = selectedRow.cells[2].innerHTML;
+  document.getElementById("submitBtn").value = "Update"; // add this line to change the submit button text to "Update"
+  document.getElementById("submitBtn").setAttribute("onClick", `updateRecord("${id}")`); // add this line to set the onclick function to "updateRecord" with the selected record id
+}
+
+function updateRecord(id) {
+  var formData = readFormData();
+  axios.put(`${api_url}/${id}`, formData)
+    .then((response) => {
+      selectedRow.cells[0].innerHTML = formData.fullname;
+      selectedRow.cells[1].innerHTML = formData.email;
+      selectedRow.cells[2].innerHTML = formData.phone;
+      document.getElementById("submitBtn").value = "Submit"; // change the submit button text back to "Submit"
+      document.getElementById("submitBtn").setAttribute("onClick", "onFormSubmit()"); // set the onclick function back to "onFormSubmit"
+      resetForm();
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+
+
+
+
 function onDelete(td) {
   var row = td.parentElement.parentElement;
   var id = td.getAttribute("data-id");
 
-  axios.delete(`https://crudcrud.com/api/cc8c91e2ac264f029237616460f73833/appointmentData/${id}`)
+  axios.delete(`${api_url}/${id}`)
     .then((response) => {
       console.log(response);
       document.getElementById("employeeList").deleteRow(row.rowIndex);
